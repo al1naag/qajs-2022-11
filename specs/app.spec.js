@@ -65,21 +65,19 @@ describe('getTotal function', () => {
     expect(getTotal).toBeTruthy()
     expect(typeof getTotal).toBe('function')
   })
-  test.each`
-    price | quantity | discount | expected
-    ${10} | ${10}    | ${0}     |${100}
-    ${10} | ${0}     | ${0}     |${0}
-    ${0}  | ${10}    | ${0}     |${0}
-    ${10} | ${10}    | ${10}    |${90}
-    ${10} | ${10}    | ${'?'}   |${'error'}
-    ${'?'}| ${10}    | ${'10'}  |${'error'}
-    ${10} | ${'?'}   | ${'10'}  |${'error'}
-    ${10} | ${10}    | ${-5}    |${'error'}
-`('returns $expected when $price * $quantity - $discount', ({ price, quantity, discount, expected }) => {
+
+  test.each([
+    [[{ price: 10, quantity: 10 }], 0, 100],
+    [[{ price: 10, quantity: 0 }], 0, 0],
+    [[{ price: 0, quantity: 10 }], 0, 0],
+    [[{ price: 10, quantity: 10 }], 10, 90],
+    [[{ price: 10, quantity: 10 }], '?', 'error'],
+    [[{ price: 10, quantity: 10 }], -5, 'error']
+  ])('%j with discount %s should equal %s', (items, discount, expected) => {
     if (expected === 'error') {
-      expect(() => getTotal(price, quantity, discount)).toThrow()
+      expect(() => getTotal(items, discount)).toThrow()
     } else {
-      expect(price * quantity - discount).toBe(expected)
+      expect(getTotal(items, discount)).toBe(expected)
     }
   })
 })
